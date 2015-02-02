@@ -87,6 +87,29 @@ function buffer_add($s,$force = false) {
       }
 }
   
+
+function nullfilter($arr) {
+  
+  foreach($arr as $key=>$value) {
+    if (strpos($key,"profile")!==FALSE && $key != "profile_image_url") unset($arr[$key]);
+    elseif (is_array($value)) {
+      $arr[$key]=nullfilter($value);
+      if (!count($arr[$key])) unset($arr[$key]);
+      if ($key === "place" || $key === "indices") unset($arr[$key]);
+      }
+    elseif (isset($arr["{$key}_str"])) unset($arr[$key]);
+    elseif ($value === null || $value === false || $value === 0 || $value === "") unset($arr[$key]);
+    elseif ($key === "created_at" && strlen($value)>12) {
+      $arr[$key]=strtotime($value);
+      }
+    elseif ($key === "source") {
+      $arr[$key]=strip_tags($value);
+      }
+    }
+  
+  return $arr;
+}
+  
   
 function proctweet($arr) {
   
